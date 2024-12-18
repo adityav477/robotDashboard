@@ -1,39 +1,39 @@
 'use client'
-
 import { useState, useEffect } from "react"
 import { RobotList } from "./robot-list"
-import { MapView } from "./map-view"
 import { Header } from "./header"
 import { StatusFilter } from "./status-filter"
 import { RobotData } from "@/types/robot"
+import dynamic from "next/dynamic";
+
+const DynamicMapView = dynamic(() => import("./map-view"), { ssr: false });
 
 export function Dashboard() {
-  const [robots, setRobots] = useState<RobotData[]>([])
-  const [filteredRobots, setFilteredRobots] = useState<RobotData[]>([])
-  const [filter, setFilter] = useState<string>("all")
+  const [robots, setRobots] = useState<RobotData[]>([]);
+  const [filteredRobots, setFilteredRobots] = useState<RobotData[]>([]);
+  const [filter, setFilter] = useState<string>("all");
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+
+    setMounted(true);
     try {
-      if (typeof window !== undefined) {
+      const socket = new WebSocket("ws://localhost:8000/ws");
 
-        const socket = new WebSocket("ws://localhost:8000/ws");
+      socket.onopen = () => {
+        console.log("websocket connection established");
+      }
 
-        socket.onopen = () => {
-          console.log("websocket connection established");
-        }
-
-        socket.onmessage = (event) => {
+      socket.onmessage = (event) => {
+        if (event.data) {
           const updatedData = JSON.parse(event.data);
 
-          console.log("Hello there");
-          if (updatedData) {
-            const dataNeeded: RobotData[] = [];
-            for (let i = 0; i <= 20; i++) {
-              dataNeeded.push(updatedData[i]);
-            }
-
-            setRobots(dataNeeded);
+          const dataNeeded: RobotData[] = [];
+          for (let i = 0; i <= 20; i++) {
+            dataNeeded.push(updatedData[i]);
           }
+
+          setRobots(dataNeeded);
         }
       }
     } catch (e) {
@@ -53,6 +53,8 @@ export function Dashboard() {
     )
   }, [robots, filter])
 
+  if (!mounted) return null
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
@@ -61,8 +63,8 @@ export function Dashboard() {
           <StatusFilter filter={filter} setFilter={setFilter} />
           <RobotList robots={filteredRobots} />
         </div>
-        <div className="w-full lg:w-1/2 ">
-          <MapView robots={filteredRobots} />
+        <div className="w-full lg:w-1/2 " >
+          <DynamicMapView robots={filteredRobots} />
         </div>
       </div>
     </div>
