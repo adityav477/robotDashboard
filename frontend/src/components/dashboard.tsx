@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from "react"
 import { RobotList } from "./robot-list"
@@ -14,27 +14,30 @@ export function Dashboard() {
 
   useEffect(() => {
     try {
-      const socket = new WebSocket("ws://localhost:8000/ws");
+      if (typeof window !== undefined) {
 
-      socket.onopen = () => {
-        console.log("websocket connection established");
-      }
+        const socket = new WebSocket("ws://localhost:8000/ws");
 
-      socket.onmessage = (event) => {
-        const updatedData = JSON.parse(event.data);
+        socket.onopen = () => {
+          console.log("websocket connection established");
+        }
 
-        console.log("Hello there");
-        if (updatedData) {
-          const dataNeeded: RobotData[] = [];
-          for (let i = 0; i <= 20; i++) {
-            dataNeeded.push(updatedData[i]);
+        socket.onmessage = (event) => {
+          const updatedData = JSON.parse(event.data);
+
+          console.log("Hello there");
+          if (updatedData) {
+            const dataNeeded: RobotData[] = [];
+            for (let i = 0; i <= 20; i++) {
+              dataNeeded.push(updatedData[i]);
+            }
+
+            setRobots(dataNeeded);
           }
-
-          setRobots(dataNeeded);
         }
       }
     } catch (e) {
-      alert("Connecton to backend failed");
+      alert(`error connecting backend ${e}`);
     }
   }, [])
 

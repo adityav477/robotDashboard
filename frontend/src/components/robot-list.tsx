@@ -1,3 +1,4 @@
+'use client'
 import {
   Table,
   TableBody,
@@ -6,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { RobotData } from "@/types/robot"
 
 interface RobotListProps {
