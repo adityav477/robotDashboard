@@ -18,6 +18,15 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+
+@app.middleware("http")
+async def enforce_websocket_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Connection"] = "Upgrade"
+    response.headers["Upgrade"] = "websocket"
+    return response
+
+
 # Import fake_robot_data
 with open("./data/fake_robot-data.json") as file:
     json_data = json.load(file)
@@ -36,23 +45,6 @@ class Robot(BaseModel):
     ramConsumption: int
     lastUpdated: str
     location: Location
-
-
-# def generate_mock_robot_data(count: int) -> List[Robot]:
-#     return [
-#         Robot(
-#             id=str(uuid.uuid4()),
-#             online=random.random() > 0.2,
-#             batteryPercentage=random.randint(0, 100),
-#             cpuUsage=random.randint(0, 100),
-#             ramConsumption=random.randint(0, 100),
-#             lastUpdated=datetime.now(timezone.utc).isoformat(),
-#             location=Location(
-#                 latitude=random.uniform(-90, 90), longitude=random.uniform(-180, 180)
-#             ),
-#         )
-#         for _ in range(count)
-#     ]
 
 
 # Convert from json to Robot instance
@@ -82,7 +74,7 @@ async def get_robots():
     return robots
 
 
-@app.websocket("/ws")
+@app.websocket("/")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:

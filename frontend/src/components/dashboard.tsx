@@ -1,4 +1,3 @@
-'use client'
 import { useState, useEffect } from "react"
 import { RobotList } from "./robot-list"
 import { Header } from "./header"
@@ -18,7 +17,8 @@ export function Dashboard() {
 
     setMounted(true);
     try {
-      const socket = new WebSocket("ws://localhost:8000/ws");
+      const socket = new WebSocket(process.env.NEXT_PUBLIC_BACKEND_WS_URL || "ws://localhost:8000");
+      console.log("backend url is ", process.env.NEXT_PUBLIC_BACKEND_WS_URL);
 
       socket.onopen = () => {
         console.log("websocket connection established");

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { Dashboard } from "@/components/dashboard"
 import { ThemeProvider } from "@/components/theme-provider"
 import { useEffect, useState } from "react"

@@ -13,7 +13,6 @@ export default function MapView({ robots }: MapViewProps) {
   const mapRef = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
 
-  //to make sure that mapRef doesn't tries to access the dom element before getting mounted
   useEffect(() => {
     setMounted(true);
 
@@ -70,6 +69,9 @@ export default function MapView({ robots }: MapViewProps) {
     }
   }, [robots]);
 
+  // if (!mounted) {
+  //   return null;
+  // }
 
   return <div id="map" className="h-[500px] mt-16 rounded-lg overflow-hidden" />;
 }
