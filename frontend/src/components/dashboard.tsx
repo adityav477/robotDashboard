@@ -4,6 +4,7 @@ import { Header } from "./header"
 import { StatusFilter } from "./status-filter"
 import { RobotData } from "@/types/robot"
 import dynamic from "next/dynamic";
+import { LoaderCircle } from "lucide-react"
 
 const DynamicMapView = dynamic(() => import("./map-view"), { ssr: false });
 
@@ -61,7 +62,13 @@ export function Dashboard() {
       <div className="flex-1 flex flex-col lg:flex-row p-4 space-y-4 lg:space-y-0 lg:space-x-4">
         <div className="w-full lg:w-1/2 space-y-4">
           <StatusFilter filter={filter} setFilter={setFilter} />
-          <RobotList robots={filteredRobots} />
+          {
+            robots[0] ?
+              <RobotList robots={filteredRobots} /> :
+              <div className="h-screen flex justify-center items-center">
+                <LoaderCircle size={72} className="text-slate-300 animate-spin" />
+              </div>
+          }
         </div>
         <div className="w-full lg:w-1/2 " >
           <DynamicMapView robots={filteredRobots} />
