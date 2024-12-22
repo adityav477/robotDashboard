@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "8000:8000" # Map port 8000 for external access
+    environment:
+      - PYTHONUNBUFFERED=1 # Ensures real-time logs
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production-stage2 # Build only the production target
+    container_name: frontend
+    ports:
+      - "3000:3000" # Map port 3000 for external access
+    environment:
+      - NEXT_PUBLIC_BACKEND_WS_URL=ws://backend:8000/ws
+    depends_on:
+      - backend # Ensure backend starts first
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
